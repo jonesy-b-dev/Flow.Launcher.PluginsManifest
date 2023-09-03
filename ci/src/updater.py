@@ -40,8 +40,8 @@ def batch_github_plugin_info(info: P, tags: ETagsType, webhook_url: str = None) 
             info[release_date] = latest_rel.get('published_at')
         if assets:
             info[url_download] = assets[0]["browser_download_url"]
-            send_notification(info, clean(
-                latest_rel["tag_name"], "v"), latest_rel, webhook_url)
+            # send_notification(info, clean(
+            #     latest_rel["tag_name"], "v"), latest_rel, webhook_url)
             info[version] = clean(latest_rel["tag_name"], "v")
 
         tags[info[id_name]] = res.headers.get(etag, "")
@@ -60,15 +60,15 @@ def batch_plugin_infos(plugin_infos: Ps, tags: ETagsType, webhook_url: str = Non
 def remove_unused_etags(plugin_infos: Ps, etags: ETagsType) -> ETagsType:
     etags_updated = {}
     plugin_ids = [info.get("ID") for info in plugin_infos]
-    
+
     for id, tag in etags.items():
-        
+
         if id not in plugin_ids:
             print(f"Plugin with ID {id} has been removed. The associated ETag will be also removed now.")
             continue
-        
+
         etags_updated[id] = tag
-    
+
     return etags_updated
 
 
@@ -87,9 +87,9 @@ if __name__ == "__main__":
         webhook_url = argv[1]
     plugin_infos = plugin_reader()
     etags = etag_reader()
-    
+
     plugin_infos_new = batch_plugin_infos(plugin_infos, etags, webhook_url)
     plugin_writer(plugin_infos_new)
-    
+
     etags_new = remove_unused_etags(plugin_infos_new, etags)
     etags_writer(etags_new)
